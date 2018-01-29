@@ -1,0 +1,91 @@
+{% extends 'survey1/main_template.html' %}
+{% block title %}*** 登陆界面 ***{% endblock %}
+{% block content %}
+{#    <script type="text/javascript">#}
+{#        var qpage = 0;#}
+{#        $(function () {#}
+{#            var options = {#}
+{#                beforeSubmit:showRequest,#}
+{#                success: showResponse,#}
+{#            };#}
+{##}
+{#            $('#qform').submit(function() {#}
+{#                $(this).ajaxSubmit(options);#}
+{#                return false;#}
+{#            });#}
+{#        });#}
+{##}
+{#        function showRequest(formData, jqForm, options) {#}
+{#            console.log("formData in showRequest: " + formData);#}
+{#            console.log("jqForm in showRequest: " + jqForm);#}
+{#            console.log("options in showRequest: " + options);#}
+{##}
+{#            var warning = ""#}
+{#            var alipayID = $('#alipayID').val();#}
+{#            if (alipayID == "") {#}
+{#                warning = warning + "支付宝帐号";#}
+{#            }#}
+{##}
+{#            var name = $('#name').val();#}
+{#            if (name == "") {#}
+{#                if (warning != "") {#}
+{#                    warning = warning + ",";#}
+{#                }#}
+{#                warning = warning + "姓名";#}
+{#            }#}
+{##}
+{#            var qID = $(questionnaireID).val();#}
+{#            qpage = qID;#}
+{#            if (qID == "") {#}
+{#                if (warning != "") {#}
+{#                    warning = warning + ",";#}
+{#                }#}
+{#                warning = warning + "问卷序号";#}
+{#            }#}
+{##}
+{#            if (warning.length != 0) {#}
+{#                warning = warning + "尚未填写。请完成后在开始答题。";#}
+{#                alert(warning);#}
+{#                return false;#}
+{#            }#}
+{##}
+{#            $("#msg").html("正在跳转......")#}
+{#            return true;#}
+{#        }#}
+{##}
+{#        function showResponse(responseText, statusText){#}
+{#            var search = document.location.search.split("=");#}
+{#            location.href = document.location.origin + search[1].replace(/\d+/, qpage);#}
+{#        }#}
+{#    </script>#}
+    {% if warnings %}
+        <h2>warning!</h2>
+        <ul>
+            {% for warning in warnings %}
+                <li>{{ warning }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <form id="qform" action="" method="post">
+        {% csrf_token %}
+        <p>
+            <label for="alipayID">支付宝账号： </label>
+            <input id="alipayID" type="text" name="alipayID" value={{ alipay }}>
+        </p>
+        <p>
+            <label for="name">真实姓名： </label>
+            <input id="name" type="text" name="name" value={{ name }}>
+        </p>
+        <p>
+            <label for="questionnaireID">问卷序号： </label>
+            <select id="questionnaireID" name="questionnaireID" >
+                {% for questionnaire in qList %}
+                    <option value= {{ questionnaire.qpage }}>{{ questionnaire.qpage }}</option>
+                {% endfor %}
+            </select>
+        </p>
+        <button id="msg" type="submit" class="btn btn-primary">开始答题</button>
+        <hr>
+
+    </form>
+{% endblock %}

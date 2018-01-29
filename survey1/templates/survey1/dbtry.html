@@ -1,0 +1,13 @@
+{% extends 'survery1/../../survey1/templates/survey1/main_template.html' %}
+{% block title %}数据库信息{% endblock %}
+{% block content %}
+{{ questions }}
+
+    {% for question in questions %}
+        <ul>
+        {% for item in question %}
+            {{ item }}
+        {% endfor %}
+        </ul>
+    {% endfor %}
+{% endblock %}

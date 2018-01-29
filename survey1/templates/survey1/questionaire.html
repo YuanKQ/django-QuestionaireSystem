@@ -1,0 +1,30 @@
+{% extends 'survey1/main_template.html' %}
+{% block title %}问卷示例{% endblock %}
+{% block content %}
+{% if warning %}
+    <h2>{{ warning }}</h2>
+{% endif %}
+<form action="" method="post">
+    {% csrf_token %}
+    {% for question in questions %}
+        <p><span class="order">{{ question.qid }}.</span><span class="content">{{ question.question_text }}</span>[多选]</p>
+        {% for symptom in question.symChoices %}
+            <span class="option">
+                <input type="checkbox" name="symptom_{{ question.id }}" value="{{ symptom }}">
+                <span class="order">{{ symptom }}</span>
+            </span><!-- End symptom -->
+        {% endfor %}
+        {% for disease in question.disChoices %}
+            <span class="option">
+                <input type="checkbox" name="disease_{{ question.id }}" value="{{ disease }}">
+                <span class="order">{{ disease }}</span>
+            </span><!-- End disease -->
+        {% endfor %}
+        <span class="option">
+                <input type="checkbox" name="neither_{{ question.id }}" value="none">
+                <span class="order">都不是</span>
+        </span><!-- End disease -->
+    {% endfor %}
+    <p><button type="submit" class="btn btn-primary">提交</button></p>
+</form>
+{% endblock %}

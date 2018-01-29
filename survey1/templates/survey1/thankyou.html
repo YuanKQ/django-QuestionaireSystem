@@ -1,0 +1,23 @@
+{% extends 'survey1/main_template.html' %}
+{% block title %}感谢您的参与{% endblock %}
+{% block content %}
+    <h2>{{ msg }}</h2>
+    <form action="" method="post">
+        {% csrf_token %}
+        <p>
+            <label for="questionnaireID">继续答题，请选择问卷： </label>
+            <select id="questionnaireID" name="questionnaireID">
+                {% for questionnaire in qList %}
+                    <option value= {{ questionnaire.qpage }}>{{ questionnaire.qpage }}</option>
+                {% endfor %}
+            </select>
+            <button name="continue" type="submit" value="continue">开始答题</button>
+        </p>
+
+        <br/>
+        <p>
+            <label for="logout">休息一下： </label>
+            <button id="logout" name="logout" type="submit" value="logout">退出</button>
+        </p>
+    </form>
+{% endblock %}

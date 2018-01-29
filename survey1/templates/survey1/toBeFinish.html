@@ -1,0 +1,109 @@
+{% extends 'survey1/main_template.html' %}
+{% block title %}TO BE FINISH{% endblock %}
+{% block content %}
+{% if warning %}
+    <h2>{{ warning }}</h2>
+{% endif %}
+    <h2>TO BE FINISH</h2>
+    <script type="text/javascript">
+        $(function(){
+            var options = {
+                // target:        '#output',   // target element(s) to be updated with server response
+                beforeSubmit:  showRequest,  // pre-submit callback
+                success:       showResponse,  // post-submit callback
+                resetForm: true,
+                dataType:  'json'
+
+                // other available options:
+                //url:       url         // override for form's 'action' attribute
+                //type:      type        // 'get' or 'post', override for form's 'method' attribute
+                //dataType:  null        // 'xml', 'script', or 'json' (expected server response type)
+                //clearForm: true        // clear all form fields after successful submit
+                //resetForm: true        // reset the form after successful submit
+
+                // $.ajax options can be used here too, for example:
+                //timeout:   3000
+            };
+
+            // bind to the form's submit event
+            $('#my_form').submit(function() {
+                // inside event callbacks 'this' is the DOM element so we first
+                // wrap it in a jQuery object and then invoke ajaxSubmit
+                $(this).ajaxSubmit(options);
+
+                // !!! Important !!!
+                // always return false to prevent standard browser submit and page navigation
+                return false;
+            });
+        });
+        // pre-submit callback
+        function showRequest(formData, jqForm, options) {
+            var uname = $("#uname").val();
+            if(uname==""){
+                $("#msg").html("姓名不能为空！");
+                return false;
+            }
+
+            var age = $("#age").val();
+            if(age==""){
+                $("#msg").html("年龄不能为空！");
+                return false;
+            }
+            $("#msg").html("正在提交...");
+
+
+            return true;
+        }
+
+        // post-submit callback
+        function showResponse(responseText, statusText)  {
+            $("#msg").html('提交成功');
+            var sex = responseText.sex==1?"男":"女";
+            $("#output").html("姓名："+responseText.uname+"&nbsp;性别："+sex+"&nbsp;年龄："+responseText.age);
+            // for normal html responses, the first argument to the success callback
+            // is the XMLHttpRequest object's responseText property
+
+            // if the ajaxSubmit method was passed an Options Object with the dataType
+            // property set to 'xml' then the first argument to the success callback
+            // is the XMLHttpRequest object's responseXML property
+
+            // if the ajaxSubmit method was passed an Options Object with the dataType
+            // property set to 'json' then the first argument to the success callback
+            // is the json data object returned by the server
+
+            //alert('status: ' + statusText + '\n\nresponseText: \n' + responseText +
+            //    '\n\nThe output div should have already been updated with the responseText.');
+        }
+    </script>
+{#<form action="" method="post">#}
+{#    {% csrf_token %}#}
+{#    {% for question in questions %}#}
+{#        <p><span class="order">{{ question.qid }}.</span><span class="content">{{ question.question_text }}</span>[多选]</p>#}
+{#        {% for symptom in question.symChoices %}#}
+{#            <span class="option">#}
+{#                <input type="checkbox" name="symptom_{{ question.id }}" value="{{ symptom }}">#}
+{#                <span class="order">{{ symptom }}</span>#}
+{#            </span><!-- End symptom -->#}
+{#        {% endfor %}#}
+{#        {% for disease in question.disChoices %}#}
+{#            <span class="option">#}
+{#                <input type="checkbox" name="disease_{{ question.id }}" value="{{ disease }}">#}
+{#                <span class="order">{{ disease }}</span>#}
+{#            </span><!-- End disease -->#}
+{#        {% endfor %}#}
+{#        <span class="option">#}
+{#                <input type="radio" name="neither_{{ question.id }}" value="@">#}
+{#                <span class="order">都不是</span>#}
+{#        </span><!-- End disease -->#}
+{#    {% endfor %}#}
+{#    <p><button type="submit" class="btn btn-primary">提交</button></p>#}
+{#</form>#}
+    <form id="my_form" action="" method="post">{% csrf_token %}
+        <p>姓名：<input type="text" name="uname" id="uname" class="input"></p>
+        <p>性别：<input type="radio" name="sex" value="1" checked> 男 <input type="radio" name="sex"
+                                                                         value="2"> 女 </p>
+        <p>年龄：<input type="text" name="age" id="age" class="input" style="width:50px"></p>
+        <p style="margin-left:30px"><input type="submit" class="btn" value="提交">
+            <span id="msg"></span></p>
+    </form>
+{% endblock %}

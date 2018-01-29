@@ -1,0 +1,135 @@
+{% extends 'survey1/main_template.html' %}
+{% block title %}*** JS问卷示例 ***{% endblock %}
+{% block content %}
+
+{#    <script type="text/javascript">#}
+{#        #}
+{#    </script>#}
+    <script type="text/javascript">
+
+        $(function () {
+            var options = {
+                beforeSubmit: showRequest,
+                success: showResponse,
+            };
+
+            $('#qform').submit(function () {
+                $(this).ajaxSubmit(options);
+                return false;
+            });
+        });
+
+        function showRequest(formData, jqForm, options) {
+            var questions = $("div.question");
+            var warning = "";
+
+            {#            alert("question长度是：" + questions.length);#}
+            for (var i = 0; questions.length > i; i++) {
+{#                console.log("question长度是：" + questions[i].val());#}
+{#                console.log("内容是：" + questions[i].val());#}
+                var option = $(questions[i]).find("input.option");
+                var j = 0;
+{#                alert("option长度是：" + option.length);#}
+                for (; option.length > j; j++) {
+                    var tmp=$(option[j]);
+{#                    tmp.css({"color":"red","border":"2px solid red"});#}
+
+                    if (tmp.context.checked) {
+                        console.log("is checked!"+j+","+i);
+                        break;
+                    }
+                }
+
+                if (j == option.length && warning.length == 0) {
+                    warning = warning + "您尚未完成第" +  $(questions[i]).prop("id");
+                }
+                else if (j == option.length) {
+                    warning = warning + "," + $(questions[i]).prop("id");
+                }
+            }
+
+            if (warning.length != 0) {
+                warning = warning + "题。请完成之后再提交。";
+                alert(warning);
+                return false;
+            }
+
+            $("#msg").html("正在提交......");
+            return true;
+        }
+
+        function showResponse(responseText, statusText) {
+{#            alert( document.location.host.concat('thanks'));#}
+            location.href = document.location.origin + "/polls/thanks/1/1/";
+        }
+    </script>
+
+
+
+    {% if warning %}
+        <h2>{{ warning }}</h2>
+    {% endif %}
+
+    <h2>答题规则：</h2>
+    <ul><li>每道题均为多选题。</li>
+        <li>请选出与题目同义或近义的词汇</li>
+        <li>每份问卷均是有偿的</li>
+    </ul>
+    {% if questions %}
+        <form id="qform" action="" method="post">
+            {% csrf_token %}
+            {% for question in questions %}
+                <hr>
+                <div class="row" style="margin-right: auto; margin-left: 10px">
+                    <div class="question" id={{ question.id }}>
+                        <p><span class="order">{{ forloop.counter0 }}.</span>
+                            <span class="content">{{ question.question_text }}</span>[{{ question.id }}]</p>
+
+                        {% for symptom in question.symChoices %}
+                            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                                <input id="symptom_{{ question.id }}_{{ forloop.counter0 }}" class="option" type="checkbox" name="symptom_{{ question.id }}" value="{{ symptom }}">
+                                <label for="symptom_{{ question.id }}_{{ forloop.counter0 }}" class="content">{{ symptom }}</label>
+                            </div>
+                        {% endfor %}
+
+                        {% for disease in question.disChoices %}
+                            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                                <input id="disease_{{ question.id }}_{{ forloop.counter0 }}" class="option" type="checkbox" name="disease_{{ question.id }}" value="{{ disease }}">
+                                <label for="disease_{{ question.id }}_{{ forloop.counter0 }}" class="content">{{ disease }}</label>
+                            </div>
+                        {% endfor %}
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-2">
+                            <input id="neither_{{ question.id }}" class="option" type="checkbox" name="neither_{{ question.id }}" value="none">
+                            <script type="text/javascript">
+                                $(function(){
+                                    var inputID = {{ question.id }};
+                                    $('input#neither_' + inputID).click(function(){
+                                        var id = $('input#neither_' + inputID).parent("div").parent("div.question").prop("id");
+                                        var bischecked = $('input[name=neither_' + id).is(':checked');
+                                        var symptoms = $('input[name=symptom_' + id);
+                                        var diseases =$('input[name=disease_' + id);
+                                        if (bischecked){
+                                            symptoms.attr('checked', false);
+                                            diseases.attr('checked', false);
+                                        }
+                                    });
+
+                                });
+                            </script>
+                            <label for="neither_{{ question.id }}" class="content">都不是</label>
+                        </div>
+
+                    </div>
+                </div>
+                <br />
+            {% endfor %}
+            <p>
+                <hr>
+                <button type="submit" class="btn btn-primary" id="msg">提交</button>
+            </p>
+        </form>
+    {% else %}
+        <h2>该问卷已完成，感谢您的参与!</h2>
+    {% endif %}
+
+{% endblock %}
